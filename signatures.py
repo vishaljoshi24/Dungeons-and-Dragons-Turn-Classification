@@ -25,3 +25,10 @@ class PlayerInstruction(dspy.Signature):
   """)
   instruction: str = dspy.OutputField(desc = "instruction on how to behave within a D&D game which describes the quality label of a particular turn.")
 
+class Assess(dspy.Signature):
+  """Assess the quality of a prompt along a specified dimension."""
+
+  assessed_text: list[str] = dspy.InputField()
+  assessment_question: str = dspy.InputField()
+  assessment_answer: bool = dspy.OutputField()
+
