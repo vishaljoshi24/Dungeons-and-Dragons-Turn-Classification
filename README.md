@@ -1,6 +1,6 @@
 ### Background 
 
-- According to Attardo 2019 (https://benjamins.com/catalog/pbns.302.08att) and Sridharan 2022 (https://studenttheses.uu.nl/handle/20.500.12932/41993), the default mode of communication within Dungeons & Dragons is "purposeful, goal-oriented, communicative cooperation" with disruptions to this mode being for humorous utterances.
+- The default mode of communication within Dungeons & Dragons is "purposeful, goal-oriented, communicative cooperation" (Sridharan 2022, https://studenttheses.uu.nl/handle/20.500.12932/41993) with disruptions to this mode being for humorous utterances.
 - Players engaging in humour with each other would return to the default mode as soon as possible in a tendency described by the "least disruption" principle (Attardo 2019).
 - This is different from conversational repair which targets undesirable conversational violations.
 - In the context of  LLM-human hybrid roleplay, engaging in "open-ended" (not goal-oriented) conversations about e.g. backstories, ideals, anecdotes and general chit-chat demonstrates desirable conversation violation which should follow the "least disruption" principle. 
