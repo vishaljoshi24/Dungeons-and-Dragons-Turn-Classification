@@ -2,16 +2,15 @@ import dspy
 from typing import Literal
 
 
-class Summary(dspy.Signature):
-  "Summarise the details of a particular D&D scenario e.g. a rat-infestation"
-  set_up: str = dspy.InputField(desc = "A description of the premise for a specific campaign.")
-  summary: str = dspy.OutputField(desc = "A summary of the campaign set-up")
-
-class Quality(dspy.Signature):
-  "Classify player quality"
-
-  action: str = dspy.InputField(desc = "The action taken by a player, which can include a description of an action or a piece of dialogue")
-  quality: Literal['collaborative action', 'contextually relevant action', 'goal-oriented action', 'open-ended action'] = dspy.OutputField(desc="The quality of a player's actions within a Dungeons & Dragons game")
+class TurnClassifier(dspy.Signature):
+    data: dict[str, str] = dspy.InputField(desc = """
+  {'context': 'The three previous game turns which describe a player's action or their dialogue.',
+   'turn': 'The current turn taken by a player, which can include a description of an action or a piece of dialogue.',
+   }""")
+    behaviour_class: Literal['collaborative',
+                             'contextually-relevant',
+                             'goal-oriented',
+                             'open-ended'] = dspy.OutputField(desc="The feature of a player's turn within a Dungeons & Dragons game: collaborative, open-ended, goal-oriented, contextually relevant")
 
 
 class PlayerInstruction(dspy.Signature):
