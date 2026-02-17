@@ -11,6 +11,7 @@ class TurnClassifier(dspy.Signature):
                              'contextually-relevant',
                              'goal-oriented',
                              'open-ended'] = dspy.OutputField(desc="The feature of a player's turn within a Dungeons & Dragons game: collaborative, open-ended, goal-oriented, contextually relevant")
+    confidence: float = dspy.OutputField()
 
 
 class PlayerInstruction(dspy.Signature):
