@@ -1,14 +1,14 @@
 import dspy
-from signatures import PlayerInstruction, Assess
+from signatures import TurnClassification, PlayerInstruction, Assess
 
-class PromptGenerator(dspy.Module):
+class ClassifyTurns(dspy.Module):
   def __init__(self):
-    # self.classifier = dspy.ChainOfThought(Quality, caching = False)
-    self.generator = dspy.ChainOfThought(PlayerInstruction, caching = False)
+    self.classifier = dspy.ChainOfThought(TurnClassification, caching = False)
+    #self.generator = dspy.ChainOfThought(PlayerInstruction, caching = False)
 
   def forward(self, examples, **kwargs):
-    # quality_class = self.classifier(action=action).quality
-    prompt = self.generator(examples=examples).instruction
+    behaviour = self.classifier(examples=examples).behaviour_class
+    #prompt = self.generator(examples=examples).instruction
     return prompt
 
 class ScorePrompt(dspy.Module):
