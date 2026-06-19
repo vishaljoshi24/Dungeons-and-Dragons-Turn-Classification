@@ -1,0 +1,125 @@
+{
+  "classifier.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "context": "Dialogue context: MARISHA: That's for Trinket? LAURA: Yeah. MATT: Okay, so who's helping Trinket?",
+        "question": "LIAM: I am. We are, I assume.",
+        "reasoning": "Liam's response indicates a group decision or assumption about assisting Trinket, which relates to in-game role allocation and cooperative strategy during the adventure. This is a tactical decision about character actions within the game's narrative.",
+        "response": "Strategising"
+      },
+      {
+        "augmented": true,
+        "context": "Dialogue context: MATT: Okay, so who's helping Trinket? LIAM: I am. We are, I assume. TRAVIS: I'll help Trinket.",
+        "question": "TALIESIN: I'll also say, if this was a gas trap, I would probably throw my mask on before passing it, as well.",
+        "reasoning": "Taliessen's suggestion about using a mask to mitigate gas trap effects involves in-game tactical considerations for surviving hazardous environmental conditions, which falls under strategic decision-making during gameplay.",
+        "response": "Strategising"
+      },
+      {
+        "augmented": true,
+        "context": "Dialogue context: TRAVIS: Just me. MATT: Okay, as everyone continues pushing forward, you reach out, helping Trinket get along. Trinket's pushing up the side of the cavern, claws scraping on the side of the wall. Foot slips, slams into the mound of dirt, at which point, the mound depresses and then (explosion) bursts open into a 20 by 20-foot gas cloud. MARISHA: Can I cast Gust of Wind really quick and push it back down the hallway?",
+        "question": "MATT: You can start doing that because it is a lingering cloud effect. Regardless, I need you and Trinket to both make a constitution save.",
+        "reasoning": "Matt's response explains the mechanics of the lingering gas cloud effect and enforces the requirement for constitution saves, which are core gameplay rules governing character actions and consequences. This directly relates to the mechanics of the game's combat and status effects.",
+        "response": "Gameplay Mechanic"
+      },
+      {
+        "augmented": true,
+        "context": "Dialogue context: MATT: Okay, as everyone continues pushing forward, you reach out, helping Trinket get along. Trinket's pushing up the side of the cavern, claws scraping on the side of the wall. Foot slips, slams into the mound of dirt, at which point, the mound depresses and then (explosion) bursts open into a 20 by 20-foot gas cloud. MARISHA: Can I cast Gust of Wind really quick and push it back down the hallway? MATT: You can start doing that because it is a lingering cloud effect. Regardless, I need you and Trinket to both make a constitution save.",
+        "question": "TRAVIS: Yes! 21! Nope, 20",
+        "reasoning": "Travis's response is a dice roll result for a constitution save, which is a core gameplay mechanic determining the outcome of the character's ability check against the poison damage. This directly relates to the mechanics of the game's saving throws and damage application.",
+        "response": "Gameplay Mechanic"
+      },
+      {
+        "context": "Dialogue context: MARISHA: I know it's hard. It's deep underground. LIAM: Oh! MARISHA: Hey!",
+        "question": "ASHLEY: This astral projection is very hard to hold. (laughter)",
+        "response": "Strategising"
+      },
+      {
+        "context": "Dialogue context: MATT: That's all right. TALIESIN: We live in an age of miracles and wonders. MATT: So as you guys pass under this cloud, you--",
+        "question": "ASHLEY: The connection is just not very strong.",
+        "response": "Strategising"
+      },
+      {
+        "context": "Dialogue context: SAM: No Pike! The evil of this place is making it hard to maintain her connection. MARISHA: I know it's hard. It's deep underground. LIAM: Oh!",
+        "question": "MARISHA: Hey!",
+        "response": "Worldbuilding"
+      },
+      {
+        "context": "Dialogue context: LAURA: We're immune to poison? MARISHA: We're immune to fear and poison. LAURA: (gasps) That's amazing!",
+        "question": "MATT: As the cloud begins to fill the area, you breathe it in and there's that reactionary point of like, \"Shit, get Trinket out of there!\" and then you realize the harshness of the toxin doesn't seem to be affecting your system. There is some element of the \"holy shit it's delicious\" feast you guys had that is keeping the toxins at bay from entering your system.",
+        "response": "Worldbuilding"
+      },
+      {
+        "context": "Dialogue context: LAURA: And Trinket ate it, too! MARISHA: That's true! LAURA: We're immune to poison?",
+        "question": "MARISHA: We're immune to fear and poison.",
+        "response": "Gameplay Mechanic"
+      },
+      {
+        "context": "Dialogue context: MATT: You take half poison damage whenever you do take poison damage. LAURA: Oh, where did Pike go? SAM: No Pike! The evil of this place is making it hard to maintain her connection.",
+        "question": "MARISHA: I know it's hard. It's deep underground.",
+        "response": "Strategising"
+      },
+      {
+        "context": "Dialogue context: TRAVIS: Heroes' Feast! LAURA: And Trinket ate it, too! MARISHA: That's true!",
+        "question": "LAURA: We're immune to poison?",
+        "response": "Gameplay Mechanic"
+      },
+      {
+        "context": "Dialogue context: ASHLEY: The connection is just not very strong. MATT: That's all right, it's much better now. Keyleth, you push the toxin cloud back and hit it off to the side, pushing it down the same tunnel that the acid section was. It'll take you a while to get it back there, but you can just leave it lingering in the tunnel if you'd like. MARISHA: No, it's fine. I'll just leave it. It's fine.",
+        "question": "MATT: Okay. It seems to be pervasive for now. It may eventually fade or sink into the earth, but it'll take a while for that to happen. But you move past this trap. You continue forward and the descent grows steadily more and more steep at this point. What was like a relative decline has now gotten to the point where some of you have to get up against the wall as you step down, not to the point where it's slide-worthy or anything, but enough where it gets a little precarious for those who don't have quite as much a grand hold on loose earth. About five minutes of this, it evens out though, and as it does you come to a metallic doorway.",
+        "response": "Worldbuilding"
+      },
+      {
+        "context": "Dialogue context: MARISHA: No, it's fine. I'll just leave it. It's fine. MATT: Okay. It seems to be pervasive for now. It may eventually fade or sink into the earth, but it'll take a while for that to happen. But you move past this trap. You continue forward and the descent grows steadily more and more steep at this point. What was like a relative decline has now gotten to the point where some of you have to get up against the wall as you step down, not to the point where it's slide-worthy or anything, but enough where it gets a little precarious for those who don't have quite as much a grand hold on loose earth. About five minutes of this, it evens out though, and as it does you come to a metallic doorway. TRAVIS: Of course.",
+        "question": "LAURA: God damn doors.",
+        "response": "Out-Of-Game Conversation"
+      },
+      {
+        "context": "Dialogue context: TRAVIS: I'll help Trinket. MATT: Okay, so just you, Grog? TRAVIS: Just me.",
+        "question": "MATT: Okay, as everyone continues pushing forward, you reach out, helping Trinket get along. Trinket's pushing up the side of the cavern, claws scraping on the side of the wall. Foot slips, slams into the mound of dirt, at which point, the mound depresses and then (explosion) bursts open into a 20 by 20-foot gas cloud.",
+        "response": "Worldbuilding"
+      },
+      {
+        "context": "Dialogue context: MATT: Okay, so just you, Grog? TRAVIS: Just me. MATT: Okay, as everyone continues pushing forward, you reach out, helping Trinket get along. Trinket's pushing up the side of the cavern, claws scraping on the side of the wall. Foot slips, slams into the mound of dirt, at which point, the mound depresses and then (explosion) bursts open into a 20 by 20-foot gas cloud.",
+        "question": "MARISHA: Can I cast Gust of Wind really quick and push it back down the hallway?",
+        "response": "Strategising"
+      },
+      {
+        "context": "Dialogue context: LAURA: That's awesome. MATT: You take half poison damage whenever you do take poison damage. LAURA: Oh, where did Pike go?",
+        "question": "SAM: No Pike! The evil of this place is making it hard to maintain her connection.",
+        "response": "Strategising"
+      }
+    ],
+    "signature": {
+      "instructions": "Given the context for a Dungeons & Dragons game turn and the game turn itself, classify the turn.",
+      "fields": [
+        {
+          "prefix": "Context:",
+          "description": "The three previous game turns which describe a player's action or their dialogue."
+        },
+        {
+          "prefix": "Question:",
+          "description": "The current turn taken by a player, which can include a description of an action or a piece of dialogue."
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Response:",
+          "description": "${response}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.12",
+      "dspy": "3.2.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}
