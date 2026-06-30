@@ -1,34 +1,45 @@
 import dspy
 from typing import Literal
 
+TurnCategory = Literal[
+    'Gameplay Mechanic',
+    'Out-Of-Game Conversation',
+    'Worldbuilding',
+    'Strategising',
+]
+
 
 class TurnClassifier(dspy.Signature):
-    data: dict[str, str] = dspy.InputField(desc = """
-  {'context': 'The three previous game turns which describe a player's action or their dialogue.',
-   'turn': 'The current turn taken by a player, which can include a description of an action or a piece of dialogue.',
-   }""")
-    behaviour_class: Literal['collaborative',
-                             'contextually-relevant',
-                             'goal-oriented',
-                             'open-ended'] = dspy.OutputField(desc="The feature of a player's turn within a Dungeons & Dragons game: collaborative, open-ended, goal-oriented, contextually relevant")
-    confidence: float = dspy.OutputField()
+    """Given the context for a Dungeons & Dragons game turn and the turn itself, classify the turn."""
+
+    context: str = dspy.InputField(
+        desc="The three previous game turns which describe a player's action or their dialogue."
+    )
+    question: str = dspy.InputField(
+        desc="The current turn taken by a player, which can include a description of an action or dialogue."
+    )
+    response: TurnCategory = dspy.OutputField()
 
 
 class PlayerInstruction(dspy.Signature):
-  "Generate a prompt which instructs an agent how to behave as a D&D player based on the labelled quality for a specific gameplay turn"
+    """Generate an instruction for a D&D player agent from a turn category."""
 
-  examples: dict[str, str] = dspy.InputField(desc = """
-  {'context': 'The three previous game turns which describe a player's action or their dialogue.',
-   'turn': 'The current turn taken by a player, which can include a description of an action or a piece of dialogue.',
-   'quality': 'The quality of a player's actions within a Dungeons & Dragons game: open-ended, goal-oriented, contextually relevant.'
-  }
-  """)
-  instruction: str = dspy.OutputField(desc = "instruction on how to behave within a D&D game which describes the quality label of a particular turn.")
+    category: TurnCategory = dspy.InputField()
+    player_instruction: str = dspy.OutputField(desc="Instruction on how to behave within a D&D game.")
+
+
+class ChatbotSignature(dspy.Signature):
+    """Respond as a D&D player character using the supplied scenario and behaviour instructions."""
+
+    instruct_prompt: str = dspy.InputField()
+    scenario_context: str = dspy.InputField()
+    user_input: str = dspy.InputField()
+    response: str = dspy.OutputField()
+
 
 class Assess(dspy.Signature):
-  """Assess the quality of a prompt along a specified dimension."""
+    """Assess the quality of a prompt along a specified dimension."""
 
-  assessed_text: list[str] = dspy.InputField()
-  assessment_question: str = dspy.InputField()
-  assessment_answer: bool = dspy.OutputField()
-
+    assessed_text: list[str] = dspy.InputField()
+    assessment_question: str = dspy.InputField()
+    assessment_answer: bool = dspy.OutputField()

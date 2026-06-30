@@ -1,46 +1,234 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
 import dspy
-from signatures import TurnClassification, PlayerInstruction, Assess
+import pandas as pd
+
+from signatures import Assess, ChatbotSignature, TurnClassifier
+
+
+DEFAULT_MODEL = "ollama_chat/qwen3:8b"
+DEFAULT_API_BASE = "http://localhost:11434"
+DEFAULT_CLASSIFIER_PATH = Path(__file__).with_name("optimized_classifier.json")
+DEFAULT_INSTRUCTIONS_PATH = Path(__file__).with_name("instructions.xlsx")
+
+
+def configure_lm(
+    model: str = DEFAULT_MODEL,
+    api_base: str = DEFAULT_API_BASE,
+    api_key: str = "",
+    max_tokens: int = 2048,
+) -> dspy.LM:
+    """Configure DSPy for the local Ollama-backed model used in the notebooks."""
+
+    lm = dspy.LM(model, api_base=api_base, api_key=api_key, max_tokens=max_tokens)
+    dspy.configure(lm=lm)
+    return lm
+
+
+def _as_text(value: Any) -> str:
+    if isinstance(value, list):
+        return "\n".join(str(item) for item in value)
+    return str(value)
+
+
+def _prediction_label(prediction: Any) -> str:
+    if isinstance(prediction, str):
+        return prediction
+    if hasattr(prediction, "response"):
+        return str(prediction.response)
+    if isinstance(prediction, dict) and "response" in prediction:
+        return str(prediction["response"])
+    return str(prediction)
+
 
 class ClassifyTurns(dspy.Module):
-  def __init__(self):
-    self.classifier = dspy.ChainOfThought(TurnClassification, caching = False)
-    #self.generator = dspy.ChainOfThought(PlayerInstruction, caching = False)
+    def __init__(self, optimized_path: str | Path | None = DEFAULT_CLASSIFIER_PATH):
+        super().__init__()
+        self.classifier = dspy.ChainOfThought(TurnClassifier, caching=False)
+        if optimized_path and Path(optimized_path).exists():
+            self.load(str(optimized_path))
 
-  def forward(self, examples, **kwargs):
-    behaviour = self.classifier(examples=examples).behaviour_class
-    #prompt = self.generator(examples=examples).instruction
-    return prompt
+    def forward(self, context: str, question: str, **kwargs: Any):
+        return self.classifier(context=context, question=question)
+
+
+class PromptTool:
+    """Retrieve behaviour instructions using the optimized turn classifier."""
+
+    def __init__(
+        self,
+        prompts_path: str | Path = DEFAULT_INSTRUCTIONS_PATH,
+        classifier: ClassifyTurns | None = None,
+    ):
+        self.prompts = self._load_prompts(prompts_path)
+        self.classify = classifier or ClassifyTurns()
+
+    @staticmethod
+    def _load_prompts(prompts_path: str | Path) -> dict[str, str]:
+        df = pd.read_excel(prompts_path)
+        df = df.drop(columns=[column for column in df.columns if str(column).startswith("Unnamed")])
+        df = df.drop_duplicates(subset=[df.columns[0]], inplace=False)
+
+        prompts: dict[str, str] = {}
+        for row in df.itertuples(index=False):
+            category, instruction = row[0], row[1]
+            prompts[str(category)] = str(instruction)
+        return prompts
+
+    def classify_input(
+        self,
+        context: str,
+        query: str,
+        user_id: str = "default_user",
+    ) -> str:
+        """Classify a player's input into a D&D behaviour category."""
+
+        prediction = self.classify(context=context, question=query)
+        return _prediction_label(prediction)
+
+    def search_prompts(
+        self,
+        prompt_class: str,
+        context: str,
+        query: str,
+        user_id: str = "default_user",
+        limit: int = 4,
+    ) -> str:
+        """Find the instruction text for a classified player behaviour."""
+
+        instruction = self.prompts.get(_prediction_label(prompt_class))
+        if not instruction:
+            return "No relevant prompt found."
+        return f"Update instructions with the following prompt:\n{instruction}"
+
+    def update_prompt(
+        self,
+        context: str,
+        query: str,
+        instruct_prompt: str,
+        prompt_text: str,
+        new_prompt: str = "",
+    ) -> str:
+        """Append retrieved instructions to the current agent prompt."""
+
+        updated_prompt = f"{_as_text(instruct_prompt)}\n{prompt_text}".strip()
+        return f"Updated prompt with new instructions: {updated_prompt}"
+
+
+class InstructedChatbot(dspy.Module):
+    """A ReAct D&D player agent with classifier-assisted behaviour instructions."""
+
+    def __init__(self, prompt_tool: PromptTool | None = None, max_iters: int = 6):
+        super().__init__()
+        self.prompt_tools = prompt_tool or PromptTool()
+        self.react = dspy.ReAct(
+            signature=ChatbotSignature,
+            tools=[
+                self.prompt_tools.classify_input,
+                self.prompt_tools.search_prompts,
+                self.prompt_tools.update_prompt,
+            ],
+            max_iters=max_iters,
+        )
+
+    def forward(self, instruct_prompt: str, scenario_context: str, user_input: str):
+        return self.react(
+            instruct_prompt=_as_text(instruct_prompt),
+            scenario_context=_as_text(scenario_context),
+            user_input=user_input,
+        )
+
+
+@dataclass
+class AgentProfile:
+    name: str
+    character: str
+    instructions: str
+
+
+@dataclass
+class TwoAgentConversation:
+    """Run two InstructedChatbot agents against each other."""
+
+    agent_a: AgentProfile
+    agent_b: AgentProfile
+    scenario: str
+    chatbot_a: InstructedChatbot = field(default_factory=InstructedChatbot)
+    chatbot_b: InstructedChatbot = field(default_factory=InstructedChatbot)
+    history: list[str] = field(default_factory=list)
+
+    def run(self, opening_message: str, rounds: int = 4) -> list[str]:
+        self.history.append(f"{self.agent_a.name}: {opening_message}")
+        next_message = opening_message
+
+        for turn_index in range(rounds):
+            speaker, chatbot = (
+                (self.agent_b, self.chatbot_b)
+                if turn_index % 2 == 0
+                else (self.agent_a, self.chatbot_a)
+            )
+
+            prediction = chatbot(
+                instruct_prompt=self._agent_prompt(speaker),
+                scenario_context=self._context(),
+                user_input=next_message,
+            )
+            next_message = _prediction_label(prediction)
+            self.history.append(f"{speaker.name}: {next_message}")
+
+        return self.history
+
+    def _context(self) -> str:
+        recent_history = "\n".join(self.history[-3:])
+        return f"{self.scenario}\n\nRecent turns:\n{recent_history}"
+
+    def _agent_prompt(self, profile: AgentProfile) -> str:
+        return (
+            "You are playing a Dungeons & Dragons scene.\n"
+            f"Character: {profile.character}\n"
+            f"{profile.instructions}\n"
+            "Stay in character and reply with only the next spoken turn."
+        )
+
 
 class ScorePrompt(dspy.Module):
-  def __init__(self):
-    self.assessment = dspy.ChainOfThought(Assess, caching=False)
+    def __init__(self):
+        super().__init__()
+        self.assessment = dspy.ChainOfThought(Assess, caching=False)
 
-  def forward(self, prompt_list, **kwargs):
-    score_list = []
-    for i in prompt_list:
-      assess_clarity = self.assessment(assessed_text=i, assessment_question="Is the assessed prompt specific, unambiguous and easy to interpret?").assessment_answer
-      assess_relevance = self.assessment(assessed_text=i, assessment_question="Does the prompt align with the categorised quality of D&D player behaviour that it is trying to express?").assessment_answer
-      assess_correctness = self.assessment(assessed_text=i, assessment_question="Is the assessed prompt correct with respect to the player quality that it is describing?").assessment_answer
-      assess_completeness = self.assessment(assessed_text=i, assessment_question="Does the prompt fully express the quality of the player's behaviour, taking into account additional context or secondary queries that might have been implied or included in the prompt?").assessment_answer
-
-      if assess_clarity == True:
-        assess_clarity = 1
-      else:
-        assess_clarity = 0
-      if assess_relevance == True:
-        assess_relevance = 1
-      else:
-        assess_relevance = 0
-      if assess_correctness == True:
-        assess_correctness = 1
-      else:
-        assess_correctness = 0
-      if assess_completeness == True:
-        assess_completeness = 1
-      else:
-        assess_completeness = 0
-
-      score = (assess_clarity + assess_relevance + assess_correctness + assess_completeness)/4
-      score_list.append(score)
-
-    return score_list
+    def forward(self, prompt_list: list[str], **kwargs: Any) -> list[float]:
+        score_list = []
+        for prompt in prompt_list:
+            scores = [
+                self.assessment(
+                    assessed_text=[prompt],
+                    assessment_question="Is the assessed prompt specific, unambiguous and easy to interpret?",
+                ).assessment_answer,
+                self.assessment(
+                    assessed_text=[prompt],
+                    assessment_question=(
+                        "Does the prompt align with the categorised quality of D&D "
+                        "player behaviour that it is trying to express?"
+                    ),
+                ).assessment_answer,
+                self.assessment(
+                    assessed_text=[prompt],
+                    assessment_question=(
+                        "Is the assessed prompt correct with respect to the player "
+                        "quality that it is describing?"
+                    ),
+                ).assessment_answer,
+                self.assessment(
+                    assessed_text=[prompt],
+                    assessment_question=(
+                        "Does the prompt fully express the quality of the player's "
+                        "behaviour, including implied context or secondary queries?"
+                    ),
+                ).assessment_answer,
+            ]
+            score_list.append(sum(1 for score in scores if score) / len(scores))
+        return score_list
