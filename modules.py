@@ -147,7 +147,7 @@ class InstructedChatbot(dspy.Module):
 class AgentProfile:
     name: str
     character: str
-    instructions: str
+    instructions: instruct_prompt
 
 
 @dataclass
