@@ -74,7 +74,7 @@ class PromptTool:
         df = df.drop_duplicates(subset=[df.columns[0]], inplace=False)
 
         prompts: list[str] = []
-        for row in df.itertuples(index=False):
+        for classes, instructions in df.values:
             examples = dspy.Example(classes=classes, instructions=instructions).with_inputs("classes", "instructions")
             promtps.append(examples)
         return prompts
