@@ -73,10 +73,10 @@ class PromptTool:
         df = df.drop(columns=[column for column in df.columns if str(column).startswith("Unnamed")])
         df = df.drop_duplicates(subset=[df.columns[0]], inplace=False)
 
-        prompts: dict[str, str] = {}
+        prompts: list[str] = []
         for row in df.itertuples(index=False):
-            category, instruction = row[0], row[1]
-            prompts[str(category)] = str(instruction)
+            examples = dspy.Example(classes=classes, instructions=instructions).with_inputs("classes", "instructions")
+            promtps.append(examples)
         return prompts
 
     def classify_input(
