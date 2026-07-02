@@ -76,7 +76,7 @@ class PromptTool:
         prompts: list[str] = []
         for classes, instructions in df.values:
             examples = dspy.Example(classes=classes, instructions=instructions).with_inputs("classes", "instructions")
-            promtps.append(examples)
+            prompts.append(examples)
         return prompts
 
     def classify_input(
@@ -87,8 +87,8 @@ class PromptTool:
     ) -> str:
         """Classify a player's input into a D&D behaviour category."""
 
-        prediction = self.classify(context=context, question=query)
-        return _prediction_label(prediction)
+        prompt_class = self.classify(context=context, question=query)
+        return prompt_class
 
     def search_prompts(
         self,
@@ -99,11 +99,13 @@ class PromptTool:
         limit: int = 4,
     ) -> str:
         """Find the instruction text for a classified player behaviour."""
-
-        instruction = self.prompts.get(_prediction_label(prompt_class))
-        if not instruction:
-            return "No relevant prompt found."
-        return f"Update instructions with the following prompt:\n{instruction}"
+        prompt_text = "Update instructions with the following prompt:\n"
+        for i in range(len(prompts)):
+            if prompt_class == prompts[i]['classes']:
+                prompt_text += prompts[i]['instructions']
+                return prompt_text
+            if not instruction:
+                return "No relevant prompt found."
 
     def update_prompt(
         self,
@@ -115,7 +117,7 @@ class PromptTool:
     ) -> str:
         """Append retrieved instructions to the current agent prompt."""
 
-        updated_prompt = f"{_as_text(instruct_prompt)}\n{prompt_text}".strip()
+        updated_prompt = instruct_prompt + new_prompt
         return f"Updated prompt with new instructions: {updated_prompt}"
 
 
